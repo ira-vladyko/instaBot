@@ -1,7 +1,30 @@
 const { IgApiClient } = require('instagram-private-api')
-const { username, password, defaultTimeout } = require('./config')
+const { username, password, defaultTimeout, followTimeout } = require('./config')
 
 const ig = new IgApiClient();
+
+const accounts = ['ira_vladuko', 'gunners__27']
+
+async function main() {
+    try {
+        console.log('попытка войти в аккаунт...')
+        await login();
+        console.log('вход успешно выполнен')
+
+        console.log('попытка получения пользователей')
+        const idsList = await getUsersList(accounts);
+        console.log(`получение пользователей успешно выполнено, найдено пользователей: ${idsList.length}`)
+
+        console.log('старт подписок')
+        await follow(idsList);
+        console.log(`подписки успешно отправлены`)
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+main()
 
 function login() {
     ig.state.generateDevice(username);
@@ -44,25 +67,10 @@ async function getUsersList(accounts) {
     return uniqueTotalFollowers;
 }
 
-async function main() {
-    const accounts = ['ira_vladuko', 'gunners__27']
-    try {
-        console.log('попытка войти в аккаунт...')
-        await login();
-        console.log('вход успешно выполнен')
-        //получаю ids подписчиков заданных аккаунтов
-        console.log('попытка получения пользователей')
-        const idsList = await getUsersList(accounts);
-        console.log(`получение пользователей успешно выполнено, найдено пользователей: ${idsList.length}`)
-        for await (let id of idsList) {
-            console.log(`попытка подписаться на ${id}`)
-            await ig.friendship.create(id)
-            await sleep(125_000)
-        }
-    }
-    catch (error) {
-        console.log(error);
+async function follow(idsList) {
+    for await (let id of idsList) {
+        console.log(`попытка подписаться на ${id}`)
+        await ig.friendship.create(id)
+        await sleep(followTimeout)
     }
 }
-
-main()
