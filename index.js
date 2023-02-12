@@ -17,8 +17,8 @@ async function getFollowersById(userId) {
     const feed = await ig.feed.accountFollowers(userId);
     do {
         const followers = await feed.items()
-        const usernameArr = followers.map((follower) => follower.username)
-        followersArr.push(...usernameArr)
+        const ids = followers.map((follower) => follower.pk)
+        followersArr.push(...ids)
         await sleep()
 
     } while (feed.isMoreAvailable())
@@ -34,20 +34,31 @@ async function getFollowersByUsername(username) {
     return followers
 }
 
+async function getUsersList(accounts) {
+    const totalFollowers = []
+    for await (const account of accounts) {
+        const followers = await getFollowersByUsername(account)
+        totalFollowers.push(...followers)
+    }
+    const uniqueTotalFollowers = [...new Set(totalFollowers)]
+    return uniqueTotalFollowers;
+}
+
 async function main() {
+    const accounts = ['ira_vladuko', 'gunners__27']
     try {
-        await login()
-
-        const totalFollowers = []
-
-        const accounts = ['ira_vladuko', 'gunners__27', 'Timosha_22']
-
-        for await (account of accounts) {
-            const followers = await getFollowersByUsername(account)
-            totalFollowers.push(...followers)
+        console.log('попытка войти в аккаунт...')
+        await login();
+        console.log('вход успешно выполнен')
+        //получаю ids подписчиков заданных аккаунтов
+        console.log('попытка получения пользователей')
+        const idsList = await getUsersList(accounts);
+        console.log(`получение пользователей успешно выполнено, найдено пользователей: ${idsList.length}`)
+        for await (let id of idsList) {
+            console.log(`попытка подписаться на ${id}`)
+            await ig.friendship.create(id)
+            await sleep(125_000)
         }
-        console.log(totalFollowers)
-
     }
     catch (error) {
         console.log(error);
