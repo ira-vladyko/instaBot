@@ -1,0 +1,28 @@
+{
+  "name": "instabot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ira-vladyko/instaBot.git"
+  },
+  "keywords": [],
+  "author": "Irina",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ira-vladyko/instaBot/issues"
+  },
+  "homepage": "https://github.com/ira-vladyko/instaBot#readme",
+  "dependencies": {
+    "instagram-private-api": "^1.45.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
