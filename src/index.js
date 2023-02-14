@@ -1,5 +1,5 @@
-const { IgApiClient } = require('instagram-private-api')
-const { username, password, defaultTimeout, followTimeout } = require('./config')
+import { IgApiClient } from 'instagram-private-api'
+import { USERNAME, PASSWORD, DEFAULT_TIMEOUT, FOLLOW_TIMEOUT } from './config.js'
 
 const ig = new IgApiClient();
 
@@ -27,13 +27,13 @@ async function main() {
 main()
 
 function login() {
-    ig.state.generateDevice(username);
-    return ig.account.login(username, password);
+    ig.state.generateDevice(USERNAME);
+    return ig.account.login(USERNAME, PASSWORD);
 }
 
-function sleep(ms = defaultTimeout) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-}
+
+const sleep = (ms = DEFAULT_TIMEOUT) => new Promise(resolve => setTimeout(resolve, ms))
+
 
 async function getFollowersById(userId) {
     const followersArr = []
@@ -48,8 +48,8 @@ async function getFollowersById(userId) {
     return followersArr
 }
 
-async function getFollowersByUsername(username) {
-    const userId = await ig.user.getIdByUsername(username)
+async function getFollowersByUsername(USERNAME) {
+    const userId = await ig.user.getIdByUsername(USERNAME)
     if (!userId) {
         return []
     }
@@ -59,18 +59,19 @@ async function getFollowersByUsername(username) {
 
 async function getUsersList(accounts) {
     const totalFollowers = []
-    for await (const account of accounts) {
+    for (const account of accounts) {
         const followers = await getFollowersByUsername(account)
         totalFollowers.push(...followers)
+
     }
     const uniqueTotalFollowers = [...new Set(totalFollowers)]
     return uniqueTotalFollowers;
 }
 
 async function follow(idsList) {
-    for await (let id of idsList) {
+    for (let id of idsList) {
         console.log(`попытка подписаться на ${id}`)
         await ig.friendship.create(id)
-        await sleep(followTimeout)
+        await sleep(FOLLOW_TIMEOUT)
     }
 }
